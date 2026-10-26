@@ -8,6 +8,8 @@ MOSEK could be used for solving the ILP formulation. MOSEK requires an additiona
 The folder optimizer has all the files for optimisation
 `edm_sa.py` and `edm_sa_ilp.py` are the two files that can be used to find the MERs. They take in: `G_in`: a `networkx` graph, `k_max`: maximum iterations and `initial_temp`: the initial temperature.
 - `edm_sa` is the function for implementing simulated annealing approach for finding MERs. This is a heuristic algorithm that can go up to graphs with 100 vertices.
+- `edm_pivot_sa(G_in, k_max, initial_temp, random_state=None)` is a pivot-based simulated annealing heuristic. It returns the best graph, the best edge-count history, and the pivot-edge sequence that produced the best graph.
+- `edm_lc_pivot_sa(G_in, k_max, initial_temp, random_state=None, pivot_probability=0.5)` mixes local-complementation and pivot moves. It returns the best graph, edge-count history, and a replayable move sequence.
 - `edm_sa_ilp(G_in, k_max, temp)` is the function for running the `SA+ILP` algorithm. We use it to find MERs for graphs up to 16 vertices.
 - `edm_ilp.py` is the source code for the `SA+ILP` algorithm that implements the ILP part of the `SA+ILP` algorithm
 

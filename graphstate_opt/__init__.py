@@ -19,6 +19,7 @@ from .base_lc import *
 from .edm_ilp import *
 from .edm_sa_ilp import *
 from .edm_sa import *
+from .edm_pivot import *
 from .wedm_ilp import *
 from .ILP_SVMinor import *
 from .ILP_VMinor import *
@@ -26,6 +27,9 @@ from .ILP_VMinor import *
 __all__ = [
     "__version__",
     "edm_sa",
+    "edm_pivot_sa",
+    "edm_lc_pivot_sa",
+    "pivot_graph",
     "edm_ilp",
     "edm_sa_ilp",
     "local_complementation",

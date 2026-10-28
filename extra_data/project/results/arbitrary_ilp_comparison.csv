@@ -1,0 +1,5 @@
+id,method,n,p,input_edges,found_edges,total_seconds,ilp_seconds,solver_status
+ER-13-p15-00,author-SA-ILP,13,0.15,15,13.999999999997115,2.505361,2.412461042404175,optimal
+ER-13-p15-00,repo-SA-LC+pivot-ILP,13,0.15,15,14.0,3.529629,3.5148208141326904,optimal
+ER-13-p75-00,author-SA-ILP,13,0.75,62,18.999999999999986,38.194433,38.082584857940674,optimal
+ER-13-p75-00,repo-SA-LC+pivot-ILP,13,0.75,62,19.0,37.620907,37.60269021987915,optimal

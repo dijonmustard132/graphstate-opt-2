@@ -1,3 +1,20 @@
+# Team benchmark guide
+
+For setup, Colab instructions, algorithm comparisons, seed counts, and result interpretation, start with [BENCHMARKS.md](BENCHMARKS.md).
+
+The consolidated findings are in [extra_data/project/results/results.md](extra_data/project/results/results.md). Run every standard comparison with:
+
+```bash
+python3 -m pip install -e .
+python3 extra_data/project/scripts/run_benchmarks.py --quick
+```
+
+For the full 20-seed benchmark:
+
+```bash
+python3 extra_data/project/scripts/run_benchmarks.py
+```
+
 # Installation
 Package is available on pypi and can be installed with `pip install graphstate-opt`.
 

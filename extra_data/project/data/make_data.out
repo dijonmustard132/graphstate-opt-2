@@ -1,9 +1,0 @@
-ER done 36 53s
-BD done 60 60s
-RES done 105 76s
-TREE done 129 76s
-GHZ done 173 82s
-REP done 201 83s
-total instances: 211 time 83s
-MERGE GHZ/star S10: same orbit as GHZ/complete K10
-MERGE REP/dense core c=5,p=0.9 + leaves: same orbit as REP/dense core c=5,p=0.8 + leaves

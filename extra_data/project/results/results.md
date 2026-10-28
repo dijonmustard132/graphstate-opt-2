@@ -1,51 +1,73 @@
-**Table 1. Test split (budget 10,000 work units; planted 300,000; 3 seeds)**
+# Benchmark results
 
-| Method | ER random | Bounded degree | Resource states | Trees | GHZ-type | Repeater-like | Planted n=30 | All (excl. planted) |
-|---|---|---|---|---|---|---|---|---|
-| SA (LC) | 1.037 (86%) | 1.002 (97%) | 1.006 (93%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.015 (94%) |
-| SA (LC+pivot) | 1.001 (98%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (99%) |
-| ILS (LC) | 1.000 (99%) | 1.000 (100%) | 1.003 (96%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.001 (99%) |
-| ILS (LC+pivot) | 1.003 (95%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.001 (98%) |
-| Tabu (LC) | 1.007 (89%) | 1.000 (100%) | 1.039 (67%) | 1.002 (98%) | 1.000 (100%) | 1.000 (100%) | 1.060 (50%) | 1.009 (91%) |
-| Tabu commit (LC) | 1.002 (98%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.001 (99%) |
-| Tabu (LC+pivot) | 1.001 (98%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (99%) |
-| Tabu (pivot only) | 1.407 (28%) | 1.160 (0%) | 1.376 (0%) | 1.404 (0%) | 1.397 (56%) | 1.144 (55%) | 1.319 (0%) | 1.355 (23%) |
+This is the central team-facing result summary. Detailed values are retained in the companion CSV files.
 
-Instances per class: ER random 43, Bounded degree 10, Resource states 18, Trees 20, GHZ-type 16, Repeater-like 11, Planted n=30 4. Cells: mean found/MER (share of runs reaching the exact minimum).
+## Reading the metrics
 
-**Table 2. Effect of adding pivot moves, test split**
+- **Mean found/MER**: result divided by a known optimum; closer to `1.0000` is better.
+- **Edge excess**: mean `found edges - known optimum`.
+- **Relative excess**: mean percentage above the known optimum.
+- For arbitrary graphs without exact labels, compare mean and best edge counts, not approximation ratios.
 
-| Comparison (first minus second) | ER random | Bounded degree | Resource states | Trees | GHZ-type | Repeater-like | All (orbits) | 95% CI (all) |
-|---|---|---|---|---|---|---|---|---|
-| SA: SA (LC+pivot) - SA (LC) | -0.036 | -0.002 | -0.006 | +0.000 | +0.000 | +0.000 | -0.0207 (exact-hit +7.8 pts, 78 orbits) | [-0.0453, -0.0057] |
-| ILS: ILS (LC+pivot) - ILS (LC) | +0.003 | +0.000 | -0.003 | +0.000 | +0.000 | +0.000 | +0.0015 (exact-hit -1.9 pts, 78 orbits) | [-0.0004, +0.0043] |
-| Tabu: Tabu (LC+pivot) - Tabu (LC) | -0.006 | +0.000 | -0.039 | -0.002 | +0.000 | +0.000 | -0.0067 (exact-hit +7.9 pts, 78 orbits) | [-0.0111, -0.0031] |
-| Tabu vs commit: Tabu (LC+pivot) - Tabu commit (LC) | -0.000 | +0.000 | +0.000 | +0.000 | +0.000 | +0.000 | -0.0002 (exact-hit +0.4 pts, 78 orbits) | [-0.0006, +0.0000] |
+## Planted larger graphs
 
-Negative = the pivot variant found smaller graphs. Unit of analysis = orbit (seeds and starts averaged within an orbit).
+LC-scrambled random trees with certified optimum `n-1`: 40 graphs, 20 seeds, and 1000 iterations.
 
-**Table 3. Same comparison pooled over all splits (more orbits; robustness check)**
+| n | Author SA-LC excess | Mixed SA LC+pivot excess | Author found/MER | Mixed found/MER |
+|---:|---:|---:|---:|---:|
+| 13 | 0.656 edges / 5.47% | 0.000 / 0.00% | 1.0547 | 1.0000 |
+| 16 | 1.356 edges / 9.04% | 0.000 / 0.00% | 1.0904 | 1.0000 |
+| 20 | 1.881 edges / 9.90% | 0.000 / 0.00% | 1.0990 | 1.0000 |
+| 30 | 3.519 edges / 12.13% | 0.031 / 0.11% | 1.1213 | 1.0011 |
+| 40 | 4.206 edges / 10.79% | 0.081 / 0.21% | 1.1079 | 1.0021 |
 
-| Comparison (first minus second) | ER random | Bounded degree | Resource states | Trees | GHZ-type | Repeater-like | All (orbits) | 95% CI (all) |
-|---|---|---|---|---|---|---|---|---|
-| SA: SA (LC+pivot) - SA (LC) | -0.026 | -0.003 | -0.002 | +0.000 | +0.000 | +0.000 | -0.0148 (exact-hit +6.6 pts, 195 orbits) | [-0.0253, -0.0069] |
-| ILS: ILS (LC+pivot) - ILS (LC) | +0.002 | +0.000 | -0.001 | +0.000 | +0.000 | +0.000 | +0.0009 (exact-hit -1.1 pts, 195 orbits) | [-0.0001, +0.0023] |
-| Tabu: Tabu (LC+pivot) - Tabu (LC) | -0.006 | -0.003 | -0.018 | -0.001 | +0.005 | -0.006 | -0.0055 (exact-hit +6.7 pts, 195 orbits) | [-0.0080, -0.0033] |
-| Tabu vs commit: Tabu (LC+pivot) - Tabu commit (LC) | -0.000 | +0.000 | +0.000 | +0.000 | +0.006 | +0.000 | +0.0000 (exact-hit +0.3 pts, 195 orbits) | [-0.0005, +0.0009] |
+Detailed table: [large_comparison.csv](large_comparison.csv).
 
-Negative = the pivot variant found smaller graphs. Unit of analysis = orbit (seeds and starts averaged within an orbit).
+## Arbitrary graphs
 
-**Table 4. All splits pooled**
+Thirty-two connected Erdős–Rényi graphs at `n=13, 16, 20, 30` and densities `0.15, 0.35, 0.55, 0.75`, with 20 seeds each. Exact optima are unknown unless an ILP solve completes; lower mean and best edge counts indicate stronger heuristic performance.
 
-| Method | ER random | Bounded degree | Resource states | Trees | GHZ-type | Repeater-like | Planted n=30 | All (excl. planted) |
-|---|---|---|---|---|---|---|---|---|
-| SA (LC) | 1.026 (89%) | 1.003 (94%) | 1.002 (97%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.001 (97%) | 1.010 (95%) |
-| SA (LC+pivot) | 1.001 (99%) | 1.001 (99%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) |
-| ILS (LC) | 1.001 (98%) | 1.000 (100%) | 1.001 (99%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (99%) |
-| ILS (LC+pivot) | 1.003 (96%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.001 (99%) |
-| Tabu (LC) | 1.007 (91%) | 1.003 (96%) | 1.018 (84%) | 1.001 (99%) | 1.001 (99%) | 1.006 (96%) | 1.068 (57%) | 1.006 (93%) |
-| Tabu commit (LC) | 1.001 (98%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.000 (99%) |
-| Tabu (LC+pivot) | 1.000 (99%) | 1.000 (100%) | 1.000 (100%) | 1.000 (100%) | 1.006 (96%) | 1.000 (100%) | 1.000 (100%) | 1.001 (99%) |
-| Tabu (pivot only) | 1.444 (19%) | 1.149 (8%) | 1.355 (0%) | 1.365 (2%) | 1.284 (55%) | 1.142 (43%) | 1.321 (10%) | 1.342 (20%) |
+The dense cases generally favour mixed LC+pivot SA. Full graph-by-density values are in [arbitrary_comparison.csv](arbitrary_comparison.csv).
 
-Instances per class: ER random 108, Bounded degree 24, Resource states 45, Trees 48, GHZ-type 44, Repeater-like 28, Planted n=30 10. Cells: mean found/MER (share of runs reaching the exact minimum).
+Sparse and dense `n=13` SA+ILP spot checks found the same ILP edge counts:
+
+| Graph | Author SA+ILP | Mixed-SA+ILP |
+|---|---:|---:|
+| ER-13-p15 | 14 edges | 14 edges |
+| ER-13-p75 | 19 edges | 19 edges |
+
+## Existing custom dataset
+
+The custom 307-graph experiment and tabu sweep show:
+
+- Mixed LC+pivot SA: exact-hit 99%, mean found/MER `1.000` on the test split.
+- Tabu LC+pivot: exact-hit 99%, mean found/MER `1.000` on the test split.
+- Author SA-LC: exact-hit 94%, mean found/MER `1.015` on the test split.
+- Tabu LC+pivot substantially outperforms plain Tabu LC on resource states and planted cases.
+
+A partial 32-graph, 20-seed closeness rerun gave:
+
+| Method | Mean edge excess | Mean relative excess |
+|---|---:|---:|
+| Author SA-LC | 0.424 | 3.72% |
+| Mixed SA LC+pivot | 0.025 | 0.14% |
+| Tabu LC | 0.005 | 0.03% |
+| Tabu LC+pivot | 0.000 | 0.00% |
+
+Detailed partial run: [comprehensive_comparison.csv](comprehensive_comparison.csv). This is not a complete rerun of every custom graph.
+
+## Reproduce
+
+```bash
+python3 extra_data/project/scripts/run_benchmarks.py
+python3 extra_data/project/scripts/run_benchmarks.py --quick
+```
+
+See the [team benchmark guide](../../../BENCHMARKS.md) for Colab, custom options, and result interpretation.
+
+## Limitations
+
+- ILP runtime and solver availability affect SA+ILP conclusions.
+- Planted tree labels are exact by connectivity and LC-orbit structure.
+- Arbitrary graph findings are heuristic unless independently solved or enumerated.
+- Tabu comparisons require equal budgets and seeds for the strongest claim.

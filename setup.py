@@ -31,7 +31,7 @@ setup(
       author = "Hemant Sharma",
       url = "https://github.com/arr0w-hs/graph_state_optimization",
       download_url = "https://github.com/user/reponame/archive/v_01.tar.gz",
-      install_requires = ["numpy", "pandas", "matplotlib", "cvxpy"],
+      install_requires = ["numpy", "pandas", "matplotlib", "networkx", "cvxpy"],
       classifiers=[
             "Programming Language :: Python",
             "Programming Language :: Python :: 3",

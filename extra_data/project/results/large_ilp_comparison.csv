@@ -1,0 +1,5 @@
+id,method,certified_mer,found_edges,total_seconds,ilp_seconds
+LC-TREE-13-000,author-SA-ILP,12,12.0,0.947373,0.860817
+LC-TREE-13-000,repo-SA-LC+pivot-ILP,12,12.0,1.287940,1.272536
+LC-TREE-13-001,author-SA-ILP,12,12.00000000000026,0.945028,0.856797
+LC-TREE-13-001,repo-SA-LC+pivot-ILP,12,12.0,1.035965,1.022081

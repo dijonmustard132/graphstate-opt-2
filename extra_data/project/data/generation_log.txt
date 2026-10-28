@@ -1,2 +1,0 @@
-MERGE GHZ/star S10: same orbit as GHZ/complete K10
-MERGE REP/dense core c=6,p=0.9 + leaves: same orbit as REP/RGS m=3

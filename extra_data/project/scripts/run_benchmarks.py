@@ -17,7 +17,7 @@ def run(command, cwd=REPO):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--only", choices=("large", "arbitrary", "custom", "all"), default="all")
+    parser.add_argument("--only", choices=("large", "arbitrary", "custom", "lowest-edge", "all"), default="all")
     parser.add_argument("--quick", action="store_true", help="Use smaller graph counts and skip ILP")
     parser.add_argument("--no-ilp", action="store_true", help="Skip ILP spot checks")
     parser.add_argument("--large-graphs", type=int)
@@ -54,6 +54,15 @@ def main():
         scripts = PROJECT / "scripts"
         run([sys.executable, "run_experiments.py", "test", str(args.seeds)], cwd=scripts)
         run([sys.executable, "aggregate.py"], cwd=scripts)
+
+    if args.only == "lowest-edge":
+        run([
+            sys.executable,
+            str(PROJECT / "scripts" / "run_lowest_edge_comparison.py"),
+            "test",
+            "--seeds", str(args.seeds),
+            "--progress-interval", "10",
+        ])
 
 
 if __name__ == "__main__":

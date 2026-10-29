@@ -1,16 +1,55 @@
 """Heuristics compared in the experiments. All take (rows, budget, rng) and return the best edge count found.
 Budget = work units from lc_tools.OPS (hardware independent)."""
-import math, random
+import math, random, threading, time
 from collections import deque
 from lc_tools import *
+
+
+class LowestEdgeReporter:
+    """Print the lowest edge count found periodically and when the final result is ready."""
+
+    def __init__(self, interval=10.0):
+        self.interval = interval
+        self._lock = threading.Lock()
+        self._best = {}
+        self._started = time.monotonic()
+        self._stop = threading.Event()
+        self._thread = threading.Thread(target=self._periodic, daemon=True)
+        self._thread.start()
+
+    def update(self, method, graph_id, edge_count):
+        with self._lock:
+            key = (method, graph_id)
+            previous = self._best.get(key)
+            if previous is None or edge_count < previous:
+                self._best[key] = edge_count
+
+    def snapshot(self):
+        with self._lock:
+            return dict(self._best)
+
+    def _periodic(self):
+        while not self._stop.wait(self.interval):
+            elapsed = time.monotonic() - self._started
+            values = self.snapshot()
+            if values:
+                print(f"[{elapsed:.0f}s] Lowest edge counts so far:", flush=True)
+                for (method, graph_id), edges in sorted(values.items()):
+                    print(f"  {method} | {graph_id}: {edges}", flush=True)
+
+    def close(self):
+        self._stop.set()
+        if self._thread.is_alive():
+            self._thread.join(timeout=0.1)
 
 T0, TEND, KICK, TENURE = 4.0, 0.3, 5, 7      # tuned earlier on separate ER training graphs (not re-tuned on this dataset)
 
 def _apply(rows, mv):
     return lc(rows, mv[1]) if mv[0] == 'v' else pivot(rows, mv[1], mv[2])
 
-def sa(rows, budget, rng, mixed=False):
+def sa(rows, budget, rng, mixed=False, on_best=None):
     rows = list(rows); n = len(rows); E = edges(rows); best = E; OPS[0] = 0
+    if on_best is not None: on_best(best)
     while OPS[0] < budget:
         T = T0 * (TEND / T0) ** min(OPS[0] / budget, 1)
         if mixed and rng.random() < 0.5:
@@ -24,7 +63,9 @@ def sa(rows, budget, rng, mixed=False):
             d = delta(rows, v); mv = ('v', v)
         if d <= 0 or rng.random() < math.exp(-d / T):
             rows = _apply(rows, mv); E += d
-            if E < best: best = E
+            if E < best:
+                best = E
+                if on_best is not None: on_best(best)
     return best
 
 def _moves(rows, mixed):
@@ -34,7 +75,7 @@ def _moves(rows, mixed):
 def _score(rows, mv):
     return delta(rows, mv[1]) if mv[0] == 'v' else pivot_delta(rows, mv[1], mv[2])
 
-def ils(rows, budget, rng, mixed=False):
+def ils(rows, budget, rng, mixed=False, on_best=None):
     rows = list(rows); OPS[0] = 0
     def descend(r):
         while OPS[0] < budget:
@@ -45,6 +86,7 @@ def ils(rows, budget, rng, mixed=False):
             r = _apply(r, rng.choice([m for s, m in sc if s == mn]))
         return r
     cur = descend(rows); Ecur = edges(cur); best = Ecur
+    if on_best is not None: on_best(best)
     while OPS[0] < budget:
         if not _moves(cur, mixed): return best
         r = list(cur)
@@ -52,13 +94,17 @@ def ils(rows, budget, rng, mixed=False):
             ms = _moves(r, mixed)
             if not ms: break
             r = _apply(r, rng.choice(ms))
-        r = descend(r); E = edges(r); best = min(best, E)
+        r = descend(r); E = edges(r)
+        if E < best:
+            best = E
+            if on_best is not None: on_best(best)
         if E <= Ecur: cur, Ecur = r, E
     return best
 
-def tabu(rows, budget, rng, use_lc=True, use_pivot=False, commit=False):
+def tabu(rows, budget, rng, use_lc=True, use_pivot=False, commit=False, on_best=None):
     """plain tabu on exact edge change over LC and/or pivot moves; commit=True adds the two-move plan (LC only)"""
     rows = list(rows); n = len(rows); E = edges(rows); best = E; OPS[0] = 0; tl = deque(maxlen=TENURE)
+    if on_best is not None: on_best(best)
     while OPS[0] < budget:
         c = []
         if use_lc:
@@ -89,16 +135,19 @@ def tabu(rows, budget, rng, use_lc=True, use_pivot=False, commit=False):
         mn = min(x[0] for x in c); _, m1, m2 = rng.choice([x for x in c if x[0] == mn])
         rows = _apply(rows, m1); tl.append(m1)
         if m2 is not None: rows = _apply(rows, m2); tl.append(m2)
-        E = edges(rows); best = min(best, E)
+        E = edges(rows)
+        if E < best:
+            best = E
+            if on_best is not None: on_best(best)
     return best
 
 METHODS = {
-    "SA (LC)":               lambda r, b, g: sa(r, b, g),
-    "SA (LC+pivot)":         lambda r, b, g: sa(r, b, g, mixed=True),
-    "ILS (LC)":              lambda r, b, g: ils(r, b, g),
-    "ILS (LC+pivot)":        lambda r, b, g: ils(r, b, g, mixed=True),
-    "Tabu (LC)":             lambda r, b, g: tabu(r, b, g),
-    "Tabu commit (LC)":      lambda r, b, g: tabu(r, b, g, commit=True),
-    "Tabu (LC+pivot)":       lambda r, b, g: tabu(r, b, g, use_pivot=True),
-    "Tabu (pivot only)":     lambda r, b, g: tabu(r, b, g, use_lc=False, use_pivot=True),
+    "SA (LC)":               lambda r, b, g, **kw: sa(r, b, g, **kw),
+    "SA (LC+pivot)":         lambda r, b, g, **kw: sa(r, b, g, mixed=True, **kw),
+    "ILS (LC)":              lambda r, b, g, **kw: ils(r, b, g, **kw),
+    "ILS (LC+pivot)":        lambda r, b, g, **kw: ils(r, b, g, mixed=True, **kw),
+    "Tabu (LC)":             lambda r, b, g, **kw: tabu(r, b, g, **kw),
+    "Tabu commit (LC)":      lambda r, b, g, **kw: tabu(r, b, g, commit=True, **kw),
+    "Tabu (LC+pivot)":       lambda r, b, g, **kw: tabu(r, b, g, use_pivot=True, **kw),
+    "Tabu (pivot only)":     lambda r, b, g, **kw: tabu(r, b, g, use_lc=False, use_pivot=True, **kw),
 }

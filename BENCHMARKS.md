@@ -42,9 +42,9 @@ python3 extra_data/project/scripts/run_benchmarks.py \
 # Run only one benchmark family
 python3 extra_data/project/scripts/run_benchmarks.py --only large
 python3 extra_data/project/scripts/run_benchmarks.py --only arbitrary
+python3 extra_data/project/scripts/run_benchmarks.py --only lowest-edge
 
-# Explicitly exclude expensive ILP spot checks
-python3 extra_data/project/scripts/run_benchmarks.py --no-ilp
+# Explicitly exclude expensive ILP spot checkspython3 extra_data/project/scripts/run_benchmarks.py --no-ilp
 ```
 
 ## Algorithms compared
@@ -64,6 +64,20 @@ python3 extra_data/project/scripts/run_benchmarks.py --no-ilp
 - `extra_data/project/data/arbitrary_manifest.csv`: connected Erdős–Rényi graphs; exact MER values are not assumed.
 - `extra_data/project/results/results.md`: consolidated team-facing benchmark summary.
 - `extra_data/project/results/*.csv`: machine-readable detailed results.
+
+## Lowest-edge comparison
+
+This benchmark compares algorithms without using exact-hit counts:
+
+```bash
+python3 extra_data/project/scripts/run_lowest_edge_comparison.py test --seeds 20
+```
+
+It prints the lowest edge count found every 10 seconds and writes `lowest_edges_test.csv` plus `lowest_edges_test.md` to `extra_data/project/results/`. Change `10.0` with `--progress-interval` if another reporting interval is required.
+
+```bash
+python3 extra_data/project/scripts/run_benchmarks.py --only lowest-edge --seeds 20
+```
 
 ## Existing custom benchmark
 

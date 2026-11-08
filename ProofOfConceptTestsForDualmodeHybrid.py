@@ -1,3 +1,11 @@
+# Adam - How to Use (Instructions For Mac, Likely To Work On Other Systems):
+# 1. Install Repo
+# 2. Run "python3 -m venv venv && source venv/bin/activate" (similar to node_modules. This command is likely different on Windows)
+# 3. Run "pip install --upgrade pip" (updates pip)
+# 4. Run "pip install -e ." (installs Deps for this file and the whole project too)
+# 5. Run "python3 ProofOfConceptTestsForDualmodeHybrid.py" (runs this file)
+# 6. When you do step 5, don't be surprised if there is a wait for the first time as matplotlib may be setting up certain things.
+
 import ast
 import math
 import os

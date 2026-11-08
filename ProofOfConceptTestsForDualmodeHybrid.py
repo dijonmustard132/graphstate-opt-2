@@ -4,7 +4,7 @@
 # 3. Run "pip install --upgrade pip" (updates pip)
 # 4. Run "pip install -e ." (installs Deps for this file and the whole project too)
 # 5. Run "python3 ProofOfConceptTestsForDualmodeHybrid.py" (runs this file)
-# 6. When you do step 5, don't be surprised if there is a wait for the first time as matplotlib may be setting up certain things.
+# 6. When you do step 5, don't be surprised if there is a wait for the first time as python may be setting up certain things.
 
 import ast
 import math
@@ -56,9 +56,24 @@ def pivot(G, u, v):
 
 
 def delta_edges_pivot(G, u, v):
-    H = G.copy()
-    pivot(H, u, v)
-    return H.number_of_edges() - G.number_of_edges()
+    """Analytic O(|Nu|*|Nv|) calculation of delta edges under a pivot on (u, v).
+
+    Equivalent to H = G.copy(); pivot(H, u, v); return H.number_of_edges() -
+    G.number_of_edges(), but without deep-copying or mutating the graph.
+    """
+    Nu = set(G.neighbors(u)) - {v}
+    Nv = set(G.neighbors(v)) - {u}
+    C = Nu & Nv
+    A = Nu - C
+    B = Nv - C
+
+    def bipartite_delta(S1, S2):
+        if not S1 or not S2:
+            return 0
+        existing = sum(1 for x in S1 for y in S2 if G.has_edge(x, y))
+        return len(S1) * len(S2) - 2 * existing
+
+    return bipartite_delta(A, B) + bipartite_delta(A, C) + bipartite_delta(B, C)
 
 
 # =====================================================================
@@ -71,6 +86,7 @@ def alg_custom_5_1(in_graph, budget, rng):
     n = g.number_of_nodes()
     cur = g.number_of_edges()
     best = cur
+    best_g = g.copy()
     evals = 0
 
     est_step_cost = max(n, n + int(0.28 * cur))
@@ -121,6 +137,7 @@ def alg_custom_5_1(in_graph, budget, rng):
             cur += best_single["dE"]
             if cur < best:
                 best = cur
+                best_g = g.copy()
                 stagnant = 0
             continue
 
@@ -210,13 +227,14 @@ def alg_custom_5_1(in_graph, budget, rng):
             cur += chosen["dE"]
             if cur < best:
                 best = cur
+                best_g = g.copy()
                 stagnant = 0
             else:
                 stagnant += 1
         else:
             stagnant += 1
 
-    return g, best, evals
+    return best_g, best, evals
 
 
 # =====================================================================
@@ -229,9 +247,8 @@ def generate_bounded_degree(n, max_d, seed):
     for _ in range(100):
         degrees = rng.integers(1, max_d + 1, size=n)
         if sum(degrees) % 2 != 0:
-            degrees[0] += 1
-            if degrees[0] > max_d:
-                degrees[0] -= 2
+            idx = int(rng.integers(0, n))
+            degrees[idx] += 1 if degrees[idx] < max_d else -1
         try:
             G = nx.havel_hakimi_graph(degrees)
             if nx.is_connected(G):
@@ -362,7 +379,9 @@ def main():
     # -----------------------------------------------------------------
     # SUITE 2: Erdős-Rényi Density Matrix (Varying n and edge density p)
     # -----------------------------------------------------------------
-    print("\n[+] SUITE 2: Erdős-Rényi Density Grid (n ∈ [10, 14, 18], p ∈ [0.25, 0.50, 0.75])")
+    print(
+        "\n[+] SUITE 2: Erdős-Rényi Density Grid (n ∈ [10, 14, 18], p ∈ [0.25, 0.50, 0.75])"
+    )
     n_values = [10, 14, 18]
     p_values = [0.25, 0.50, 0.75]
     reps_per_cell = 4
@@ -375,9 +394,10 @@ def main():
                 # Ensure simple connectivity
                 if not nx.is_connected(G):
                     comps = list(nx.connected_components(G))
+                    comp_rng = random.Random(seed)
                     for c_idx in range(len(comps) - 1):
-                        u = random.Random(seed).choice(list(comps[c_idx]))
-                        v = random.Random(seed).choice(list(comps[c_idx + 1]))
+                        u = comp_rng.choice(list(comps[c_idx]))
+                        v = comp_rng.choice(list(comps[c_idx + 1]))
                         G.add_edge(u, v)
 
                 run_single_comparison(
@@ -387,12 +407,16 @@ def main():
                     seed=seed,
                     budget=1800,
                 )
-    print(f"    -> Finished {len(n_values) * len(p_values) * reps_per_cell} ER grid trials.")
+    print(
+        f"    -> Finished {len(n_values) * len(p_values) * reps_per_cell} ER grid trials."
+    )
 
     # -----------------------------------------------------------------
     # SUITE 3: Hardware Bounded-Degree Topologies (Max Degree 3, 5)
     # -----------------------------------------------------------------
-    print("\n[+] SUITE 3: Hardware Bounded-Degree Topologies (d_max ∈ [3, 5], n ∈ [12, 16, 22])")
+    print(
+        "\n[+] SUITE 3: Hardware Bounded-Degree Topologies (d_max ∈ [3, 5], n ∈ [12, 16, 22])"
+    )
     bd_configs = [(12, 3), (12, 5), (16, 3), (16, 5), (22, 3), (22, 5)]
     reps_bd = 4
 
@@ -429,7 +453,9 @@ def main():
                 seed=seed,
                 budget=scaled_budget,
             )
-    print(f"    -> Finished {len(scaling_nodes) * reps_scale} High-Qubit scaling trials.")
+    print(
+        f"    -> Finished {len(scaling_nodes) * reps_scale} High-Qubit scaling trials."
+    )
 
     # =================================================================
     # AGGREGATE SUMMARY REPORTS
@@ -453,9 +479,7 @@ def main():
     print(
         f"  * Your Algorithm Wins : {yours_wins:3d} ({yours_wins / total_runs * 100:.1f}%)"
     )
-    print(
-        f"  * Ties                : {ties:3d} ({ties / total_runs * 100:.1f}%)"
-    )
+    print(f"  * Ties                : {ties:3d} ({ties / total_runs * 100:.1f}%)")
     print(
         f"  * Their EDM-SA Wins   : {theirs_wins:3d} ({theirs_wins / total_runs * 100:.1f}%)"
     )

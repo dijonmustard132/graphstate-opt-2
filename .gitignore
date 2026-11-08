@@ -7,3 +7,7 @@ gso.egg-info/
 **/edge_minimisation/bd_results/
 **/edge_minimisation/wedm_results/
 **/edge_minimisation/er_results/
+
+# Adam - Gitignore dependencies that will be installed to your local machine
+venv/
+.venv/

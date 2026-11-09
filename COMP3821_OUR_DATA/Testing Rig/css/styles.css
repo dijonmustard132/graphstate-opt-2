@@ -1,0 +1,444 @@
+:root {
+  /* Google/Meta inspired neutral & primary tokens */
+  --primary: #1a73e8;          /* Google Action Blue */
+  --primary-hover: #1557b0;
+  --primary-light: #e8f0fe;
+  --bg: #f8f9fa;               /* Clean off-white surface */
+  --surface: #ffffff;          /* Pure white card backgrounds */
+  --border: #dadce0;           /* Subtle Google/Material border */
+  --border-subtle: #f1f3f4;
+  --text: #202124;             /* High contrast dark grey */
+  --text-secondary: #5f6368;   /* Balanced secondary text */
+  --text-muted: #80868b;
+  
+  --success: #1e8e3e;
+  --success-bg: #e6f4ea;
+  --warning: #f9ab00;
+  --warning-bg: #fef7e0;
+  
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 9999px;
+
+  --shadow-subtle: 0 1px 2px 0 rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+  --shadow-card: 0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.06);
+}
+
+/* Base resets */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Layout */
+.app-header {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 24px 0;
+  margin-bottom: 24px;
+}
+
+.header-container,
+.main-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+.header-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--primary);
+  background: var(--primary-light);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.2px;
+}
+
+.subtitle {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+/* Card Surface */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: var(--shadow-card);
+}
+
+.card h2 {
+  font-size: 1.15rem;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+  color: var(--text);
+}
+
+.card-subtitle {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin: 0 0 16px 0;
+}
+
+/* Form Controls */
+.grid-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: flex-end;
+}
+
+.custom-controls {
+  display: flex;
+  gap: 12px;
+  align-items: flex-end;
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.control-group.flex-grow {
+  flex-grow: 1;
+}
+
+label, .label-text {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: 0.2px;
+}
+
+.form-input {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  font-size: 0.88rem;
+  border-radius: var(--radius-sm);
+  outline: none;
+  transition: all 0.15s ease-in-out;
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.15);
+}
+
+.form-input-sm {
+  width: 70px;
+  padding: 4px 8px;
+  font-size: 0.8rem;
+}
+
+/* Buttons */
+.actions-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 20px;
+  padding-top: 18px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+}
+
+.btn {
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  outline: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #fff;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--primary-hover);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.btn-secondary {
+  background: #f1f3f4;
+  color: var(--text);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: #e8eaed;
+}
+
+.btn-outlined {
+  background: transparent;
+  border-color: var(--border);
+  color: var(--text-secondary);
+}
+.btn-outlined:hover:not(:disabled) {
+  background: #f8f9fa;
+  color: var(--text);
+}
+
+/* Segmented Control Buttons (Like Google Cloud / Facebook toggle bars) */
+.segmented-control {
+  display: inline-flex;
+  background: #f1f3f4;
+  border-radius: var(--radius-sm);
+  padding: 2px;
+}
+
+.seg-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.78rem;
+  font-weight: 500;
+  padding: 5px 12px;
+  color: var(--text-secondary);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.seg-btn.active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  font-weight: 600;
+}
+
+/* Algorithm Pill Chips */
+.algo-section {
+  margin-top: 18px;
+}
+
+.algo-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.algo-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid var(--border);
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  font-size: 0.8rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, background-color 0.15s;
+}
+
+.algo-pill:hover {
+  background: #f8f9fa;
+  border-color: #bdc1c6;
+}
+
+.algo-pill input[type="checkbox"] {
+  accent-color: var(--primary);
+  margin: 0;
+}
+
+/* Status & Progress */
+.progress-box {
+  width: 100%;
+  height: 4px;
+  background: #e8eaed;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+  margin-top: 18px;
+  display: none;
+}
+
+.progress-fill {
+  height: 100%;
+  width: 0%;
+  background: var(--primary);
+  transition: width 0.2s ease-in-out;
+}
+
+.status-text {
+  margin-top: 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Chart Card & Layout */
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.chart-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.inline-inputs {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.chart-wrapper {
+  position: relative;
+  height: 380px;
+  width: 100%;
+}
+
+/* Modern Clean Tables (Meta / Google Style) */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  margin-top: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+  text-align: left;
+}
+
+th, td {
+  padding: 12px 14px;
+  white-space: nowrap;
+  border: none;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+th {
+  background: #f8f9fa;
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--border);
+}
+
+tr:last-child td {
+  border-bottom: none;
+}
+
+tr:hover td {
+  background: #f8fafd;
+}
+
+/* Badges & Accents */
+.badge {
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.badge-opt {
+  background: var(--success-bg);
+  color: var(--success);
+}
+
+.badge-win {
+  background: var(--primary-light);
+  color: var(--primary);
+}
+
+.best-score {
+  font-weight: 600;
+  color: var(--success);
+}
+
+.rank-1 {
+  color: #b06000;
+  font-weight: 700;
+}
+
+/* Clean Secondary Text & Color Helpers */
+.text-secondary { color: var(--text-secondary); }
+.text-primary { color: var(--primary); }
+.font-medium { font-weight: 500; }
+
+/* Subtle Meta/Google badges */
+.badge-neutral {
+  background: #f1f3f4;
+  color: var(--text);
+  font-weight: 500;
+}
+
+.badge-subtle {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+  font-weight: 500;
+}
+
+.star-pill {
+  color: #f9ab00;
+  font-size: 0.8rem;
+  margin-left: 2px;
+}
+
+/* Interactive Pill State */
+.algo-pill:has(input:checked) {
+  background: var(--primary-light);
+  border-color: rgba(26, 115, 232, 0.4);
+  color: var(--primary);
+  font-weight: 500;
+}

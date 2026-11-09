@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Minimum Edge Representative (MER) Benchmark</title>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+
+  <header class="app-header">
+    <div class="header-container">
+      <div class="header-badge">Evaluation Framework</div>
+      <h1>Minimum Edge Representative (MER) Benchmark</h1>
+      <p class="subtitle">Parametric graph topology evaluation under discrete compute constraints.</p>
+    </div>
+  </header>
+
+  <main class="main-container">
+
+    <!-- CONTROL PANEL -->
+    <section class="card">
+      <div class="card-header">
+        <h2>Parameters</h2>
+      </div>
+
+      <div class="grid-controls">
+        <div class="control-group">
+          <label for="suiteSelect">Benchmark Suite</label>
+          <select id="suiteSelect" class="form-input"></select>
+        </div>
+
+        <div id="customControls" class="custom-controls" style="display:none;">
+          <div class="control-group">
+            <label for="customGenSelect">Graph Generator</label>
+            <select id="customGenSelect" class="form-input"></select>
+          </div>
+          <div class="control-group">
+            <label for="customN">Order (|V|)</label>
+            <input type="number" id="customN" class="form-input" value="30" min="6" max="250">
+          </div>
+          <div class="control-group">
+            <label for="customParam">Parameter (p / k)</label>
+            <input type="number" id="customParam" class="form-input" value="0.5" step="0.1">
+          </div>
+        </div>
+
+        <div class="control-group flex-grow">
+          <label for="budgetInput">Compute Budgets (Evaluations)</label>
+          <input type="text" id="budgetInput" class="form-input" value="100, 1000, 5000, 20000, 100000">
+        </div>
+
+        <div class="control-group">
+          <label for="seedInput">Random Seeds</label>
+          <input type="text" id="seedInput" class="form-input" value="42" placeholder="e.g. 42, 137, 2026">
+        </div>
+      </div>
+
+      <div class="actions-row">
+        <div class="button-group">
+          <button id="runBtn" class="btn btn-primary">Execute</button>
+          <button id="randSeedBtn" class="btn btn-secondary">Sample Seed</button>
+        </div>
+        <div class="button-group">
+          <button id="exportCsvBtn" class="btn btn-outlined" disabled>Export CSV</button>
+          <button id="exportJsonBtn" class="btn btn-outlined" disabled>Export JSON</button>
+            <button type="button" id="importJsonBtn" class="btn btn-outlined">Import JSON</button>
+            <input type="file" id="importJsonInput" accept=".json" style="display:none;">
+        </div>
+      </div>
+
+      <div class="algo-section">
+        <span class="label-text">Candidate Algorithms</span>
+        <div class="algo-container" id="algoToggles"></div>
+      </div>
+
+      <div class="progress-box" id="pBox">
+        <div class="progress-fill" id="pFill"></div>
+      </div>
+      <div id="statusText" class="status-text">Status: Idle</div>
+    </section>
+
+    <!-- SCALING CHART CARD -->
+    <section class="card" id="chartCard" style="display:none;">
+      <div class="chart-header">
+        <div>
+          <h2>Compute Scaling Profile</h2>
+          <p class="card-subtitle">Mean |E| vs. Compute Budget (minimization objective)</p>
+        </div>
+
+        <!-- Controls: X-Scale Mode & Y-Axis Zoom -->
+        <div class="chart-toolbar">
+
+            <div class="inline-inputs">
+            <label for="chartFamilyFilter">Graph Class</label>
+            <select id="chartFamilyFilter" class="form-input form-input-sm">
+              <option value="ALL">All Topologies (Aggregate)</option>
+            </select>
+          </div>
+          <div class="segmented-control">
+            <button type="button" id="btnScaleRegular" class="seg-btn">Ordinal</button>
+            <button type="button" id="btnScaleLinear" class="seg-btn active">Linear</button>
+          </div>
+
+          <div class="segmented-control">
+            <button type="button" id="btnYAuto" class="seg-btn active">Auto</button>
+            <button type="button" id="btnYTight" class="seg-btn">Bounded</button>
+            <button type="button" id="btnYZero" class="seg-btn">Origin (0)</button>
+          </div>
+
+          <div class="inline-inputs">
+            <label for="manualYMin">Min</label>
+            <input type="number" id="manualYMin" class="form-input form-input-sm" placeholder="Auto">
+            <label for="manualYMax">Max</label>
+            <input type="number" id="manualYMax" class="form-input form-input-sm" placeholder="Auto">
+          </div>
+        </div>
+      </div>
+
+      <div class="chart-wrapper">
+        <canvas id="scalingChart"></canvas>
+      </div>
+    </section>
+
+    <!-- BUDGET MATRIX -->
+    <section class="card" id="scalingCard" style="display:none;">
+      <h2>Budget Scaling Matrix</h2>
+      <p class="card-subtitle">Mean final edge count across budget thresholds.</p>
+      <div class="table-responsive">
+        <table>
+          <thead><tr id="scalingHeaderRow"></tr></thead>
+          <tbody id="scalingBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- AGGREGATE SUMMARY -->
+    <section class="card" id="leaderboardCard" style="display:none;">
+      <h2>Aggregate Performance Comparison</h2>
+      <p class="card-subtitle">Summary metrics pooled across all topologies and evaluation bounds.</p>
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>Rank</th>
+              <th>Algorithm</th>
+              <th>Mean |E|</th>
+              <th>Mean Reduction (%)</th>
+              <th>Mean Optimality Gap</th>
+              <th>Optimality Rate (%)</th>
+              <th>Top-Rank Count</th>
+              <th>Mean Latency / Run</th>
+              <th>Total Compute Time</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboardBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- GRAPH CLASS BREAKDOWN -->
+    <section class="card" id="familyCard" style="display:none;">
+      <h2>Performance by Graph Class</h2>
+      <div class="table-responsive">
+        <table>
+          <thead><tr id="familyHeaderRow"></tr></thead>
+          <tbody id="familyBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PER-INSTANCE RESULTS -->
+    <section class="card" id="detailsCard" style="display:none;">
+      <h2>Per-Instance Experimental Data</h2>
+      <div class="table-responsive">
+        <table>
+          <thead><tr id="detailsHeaderRow"></tr></thead>
+          <tbody id="detailsBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+  </main>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

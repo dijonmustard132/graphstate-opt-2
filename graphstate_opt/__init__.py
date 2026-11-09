@@ -24,6 +24,9 @@ from .wedm_ilp import *
 from .ILP_SVMinor import *
 from .ILP_VMinor import *
 
+from .edm_dualmode_anytime import edm_dualmode_anytime
+from .edm_dualmode_deep import edm_dualmode_deep
+
 __all__ = [
     "__version__",
     "edm_sa",
@@ -35,4 +38,7 @@ __all__ = [
     "local_complementation",
     "wedm_ilp",
     "has_VM",
+    # Added entries, by us:
+    "edm_dualmode_anytime",
+    "edm_dualmode_deep",
 ]

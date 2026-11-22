@@ -1,4 +1,4 @@
-"""Verify the nine nontrivial configured targets in the 75-instance suite.
+"""Verify the nine nontrivial target-labelled instances in the 75-instance suite.
 
 The graph definitions match the final_report_75 suite in
 COMP3821_OUR_DATA/Testing Rig/js/generators.js in the Group 34 repository.
@@ -6,7 +6,9 @@ They are enumerated before scrambling because every scrambling move is an LC.
 The 16 planted trees and five complete bipartite graphs have a direct tree
 certificate, so they do not require exhaustive enumeration.
 
-Run with: python target_audit.py
+Will not run on older python versions!
+
+Run with: python3 target_audit.py
 """
 
 from collections import deque
@@ -85,13 +87,16 @@ if __name__ == "__main__":
         ("Defect-4-8-M3", 4, 3, (13, 6480)),
         ("Defect-3-9-M1", 3, 1, (11, 214)),
     ]
-    cases = [(name, 8, target, edges, expected) for name, target, edges, expected in cabello]
+    cases = [
+        (name, 8, earlier_label, edges, expected)
+        for name, earlier_label, edges, expected in cabello
+    ]
     cases.extend(
         (name, 12, 11, defective_bipartite_edges(a, missing_count), expected)
         for name, a, missing_count, expected in defective
     )
-    print("Instance,Configured target,Exact minimum,Labelled orbit size")
-    for name, n, target, edges, expected in cases:
+    print("Instance,Earlier label,Verified minimum,Orbit size")
+    for name, n, earlier_label, edges, expected in cases:
         minimum, orbit_size = orbit_minimum(n, edges)
         assert (minimum, orbit_size) == expected, name
-        print(f"{name},{target},{minimum},{orbit_size}")
+        print(f"{name},{earlier_label},{minimum},{orbit_size}")

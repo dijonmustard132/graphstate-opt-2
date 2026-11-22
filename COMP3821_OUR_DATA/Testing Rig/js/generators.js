@@ -61,9 +61,9 @@ export const GRAPH_GENERATORS = {
   "report_bipartite/defective": {
     name: "Defective Bipartite K(a, b) \\ M",
     generate: (n, config, rng) => {
-      const a = config.a || 6;
+      const a = (config && config.a) ? config.a : 6;
       const b = n - a;
-      const removeCount = config.m || 1;
+      const removeCount = (config && config.m !== undefined) ? config.m : 1;
       const g = new Graph(n);
       for (let i = 0; i < a; i++) {
         for (let j = a; j < n; j++) g.addEdge(i, j);
@@ -77,14 +77,28 @@ export const GRAPH_GENERATORS = {
           removed++;
         }
       }
-      return { graph: g, groundTruth: n - 1, family: "Bipartite Defective" };
+
+      // Exact BFS-verified MERs (Table 5); return null for unverified combinations
+      const verifiedDefects = {
+        "12-6-1": 11,
+        "12-6-4": 14,
+        "12-4-1": 11,
+        "12-4-3": 13,
+        "12-3-1": 11
+      };
+      const key = `${n}-${a}-${removed}`;
+      const groundTruth = Object.prototype.hasOwnProperty.call(verifiedDefects, key)
+        ? verifiedDefects[key]
+        : null;
+
+      return { graph: g, groundTruth, family: "Bipartite Defective" };
     }
   },
   "report_canonical/cabello_orbit": {
     name: "Cabello Canonical Orbit (n=8)",
     generate: (n, orbitId, rng) => {
       const g = new Graph(8);
-      let targetMER = 7;
+      let targetMER = null;
       if (orbitId === 1) {
         for (let i = 1; i < 8; i++) g.addEdge(0, i);
         targetMER = 7;
@@ -95,14 +109,14 @@ export const GRAPH_GENERATORS = {
       } else if (orbitId === 119) {
         const edges = [[0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,0],[0,7],[3,7]];
         edges.forEach(([u, v]) => g.addEdge(u, v));
-        targetMER = 8;
+        targetMER = 9;
       } else if (orbitId === 146) {
         const edges = [
           [0,1],[1,2],[2,3],[3,4],[4,5],[5,6],[6,7],[7,0],
           [0,4],[1,5],[2,6],[3,7]
         ];
         edges.forEach(([u, v]) => g.addEdge(u, v));
-        targetMER = 9;
+        targetMER = 12;
       }
       scrambleGraph(g, 24, rng);
       return { graph: g, groundTruth: targetMER, family: "Cabello Orbit" };

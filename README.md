@@ -1,52 +1,33 @@
-# Team benchmark guide
+# Heuristic Search for Minimum-Edge Graph States (`graphstate-opt-2`)
 
-For setup, Colab instructions, algorithm comparisons, seed counts, and result interpretation, start with [BENCHMARKS.md](BENCHMARKS.md).
+**COMP3821/9801 (Extended Algorithm Design and Analysis) — Group 34 (Term 3, 2026)**  
+*Budgeted optimisation over local-complementation orbits*
 
-The consolidated findings are in [extra_data/project/results/results.md](extra_data/project/results/results.md). Run every standard comparison with:
+**Group members:** Adam Burges, Dexuan Lin, Jack Petersen, Nicholas Mulquiney
 
-```bash
-python3 -m pip install -e .
-python3 extra_data/project/scripts/run_benchmarks.py --quick
-```
+**Project mentor:** Ryan Ong
 
-For the full 20-seed benchmark:
+---
 
-```bash
-python3 extra_data/project/scripts/run_benchmarks.py
-```
+## Overview
 
-# Installation
-Package is available on pypi and can be installed with `pip install graphstate-opt`.
+This repository contains the browser-based benchmarking rig, archived experimental results, orbit-verification script, and upstream baseline comparator for our study comparing five simulated-annealing and local-search heuristics for finding sparse (minimum-edge) locally equivalent graph states under finite evaluation budgets:
 
-# Optional additional requirements
-MOSEK could be used for solving the ILP formulation. MOSEK requires an additional step of download and activation of license file. Mosek can be installed via `pip install mosek` or `pip install "graphstate-opt[mosek]"`. Information about mosek license can be found here: <https://docs.mosek.com/11.0/licensing/quickstart.html>.
+- **`EDM-SA`** — Reimplementation of Sharma et al.’s single-LC simulated annealing baseline (`Mv = Cv * dv` scoring, logarithmic cooling)
+- **`Exact-Geom-SA`** — Exact single-LC scoring (`Δv`) with softmax proposal and geometric cooling
+- **`Pivot-SA`** — Exact LC + unpruned edge-pivot scoring with greedy `min-Δ` proposal and geometric cooling
+- **`DualMode-Anytime`** — Exact LC scoring, 4-vertex tabu list, LC/pivot short-circuits, pruned pivots, adaptive budget-matched cooling, and stagnation reheating
+- **`DualMode-Deep`** — Exact LC + permissive pivot scoring, 2-step LC tunnel, 64-slot FNV-1a state-hash cycle filter, and 3-LC kick from incumbent with slower geometric cooling
 
-# Codes for finding the MER for a given input graph
-The folder optimizer has all the files for optimisation
-`edm_sa.py` and `edm_sa_ilp.py` are the two files that can be used to find the MERs. They take in: `G_in`: a `networkx` graph, `k_max`: maximum iterations and `initial_temp`: the initial temperature.
-- `edm_sa` is the function for implementing simulated annealing approach for finding MERs. This is a heuristic algorithm that can go up to graphs with 100 vertices.
-- `edm_pivot_sa(G_in, k_max, initial_temp, random_state=None)` is a pivot-based simulated annealing heuristic. It returns the best graph, the best edge-count history, and the pivot-edge sequence that produced the best graph.
-- `edm_lc_pivot_sa(G_in, k_max, initial_temp, random_state=None, pivot_probability=0.5)` mixes local-complementation and pivot moves. It returns the best graph, edge-count history, and a replayable move sequence.
-- `edm_sa_ilp(G_in, k_max, temp)` is the function for running the `SA+ILP` algorithm. We use it to find MERs for graphs up to 16 vertices.
-- `edm_ilp.py` is the source code for the `SA+ILP` algorithm that implements the ILP part of the `SA+ILP` algorithm
+---
 
-# Edge-minimisation folder
-The edge minimisation folder contains the files that can be used to
-- Generate bounded-degree (BD) and Erdos-Renyi (ER) graphs using `gen_bd.py` and `gen_er.py` files respectively.
-- Run edge-minimisation of BD and ER graph using `edm_bd_opt.py` and `edm_bd_opt.py` files respectively.
-- `plot_bd.py` and `plot_er.py` files for plotting the results for BD and ER graphs respectively.
-- The files that start with `grgs_sampling.py` is for sampling gRGS. `grgs_comparison.py` is to analyse and plot the effects of varying fusion probabilities on the resources required to create a gRGS state.
-- `weighted_edm.py` shows a use case of the weighted-edge minimization for distributing graph states in a network. It shows the input graph and the final optimized graph
+## Repository Structure
 
-# The tutorial file
-`tutorial-1.ipynb` is the file that shows how the aforementioned functions could be used to find MERs. It plots the input graph, approximate MER from `EDM-SA` and the exact MER from `EDM-SAILP`. It also prints the runtime of the `EDM-SAILP` and `EDM-ILP` algorithms.
-
-# Data files
-Data files can be found at [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.15534839.svg)](https://doi.org/10.5281/zenodo.15534839) and should be put in the folder `edge_minimisation` so that the python files can access the data.
-
-# MER data
-CSV files containing the MERs we have obtained for bounded-degree and Erdos-Renyi graphs are placed in "data/bd_mers.csv" and "data/er_mers.csv" respectively. Each row of the CSV has three columns containing the following information about a graph:
-
-- `num_vertices`: number of vertices in the graph
-- `num_edges`: number of edges in the graph
-- `edges`: Python-style list of edge tuples, e.g. `[(0, 1), (1, 2)]`
+```text
+.
+├── COMP3821_OUR_DATA/
+│   ├── Testing Rig/          # Browser benchmarking rig (index.html, generators.js, etc.)
+│   └── ...                   # JSON results archive for the report
+├── edm_sa.py                 # Sharma et al. upstream Python EDM-SA comparator
+├── target_audit.py           # Exhaustive BFS orbit verifier for small target-labelled graphs
+└── README.md
